@@ -24,7 +24,8 @@ const style = {
 
 export default function Header() {
   const [selectedNav, setSelectedNav] = useState('swap')
-  const [userName, setUserName] = useState<string>()
+  const [userName, setUserName] = useState<string>('')
+
   return (
     <div className={style.wrapper}>
       <div className={style.headerLogo}>
