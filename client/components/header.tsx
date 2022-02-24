@@ -6,6 +6,7 @@ import { useContext } from 'react'
 import Image from 'next/image'
 import ethLogo from '../assets/eth.png'
 import uniswapLogo from '../assets/uniswap.png'
+import { TransactionContext } from '../context/TransactionContext'
 
 const style = {
   wrapper: `p-4 w-screen flex justify-between items-center`,
@@ -25,6 +26,7 @@ const style = {
 export default function Header() {
   const [selectedNav, setSelectedNav] = useState('swap')
   const [userName, setUserName] = useState<string>('')
+  const { connectWallet, currentAccount } = useContext(TransactionContext)
 
   return (
     <div className={style.wrapper}>
@@ -80,9 +82,16 @@ export default function Header() {
         </div>
 
         <div className={`${style.button} ${style.buttonPadding}`}>
-          <div className={`${style.buttonAccent} ${style.buttonPadding}`}>
-            Connect Wallet
-          </div>
+          {currentAccount ? (
+            <p>{currentAccount.substr(0, 5)}...</p>
+          ) : (
+            <div
+              className={`${style.buttonAccent} ${style.buttonPadding}`}
+              onClick={connectWallet}
+            >
+              Connect Wallet
+            </div>
+          )}
         </div>
 
         <div className={`${style.button} ${style.buttonPadding}`}>
