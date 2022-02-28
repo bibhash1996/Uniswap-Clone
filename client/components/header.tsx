@@ -6,7 +6,7 @@ import { useContext } from 'react'
 import Image from 'next/image'
 import ethLogo from '../assets/eth.png'
 import uniswapLogo from '../assets/uniswap.png'
-import { TransactionContext } from '../context/TransactionContext'
+import { TransactionContext } from '../context/transactionContext'
 
 const style = {
   wrapper: `p-4 w-screen flex justify-between items-center`,
@@ -83,7 +83,9 @@ export default function Header() {
 
         <div className={`${style.button} ${style.buttonPadding}`}>
           {currentAccount ? (
-            <p>{currentAccount.substr(0, 5)}...</p>
+            <p>
+              {currentAccount.slice(0, 5)}...{currentAccount.slice(35, 42)}
+            </p>
           ) : (
             <div
               className={`${style.buttonAccent} ${style.buttonPadding}`}

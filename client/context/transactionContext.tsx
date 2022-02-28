@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { ethers } from 'ethers'
+import { contractABI, contractAddress } from '../lib/constants'
 
 type Context = {
   connectWallet: () => void
+  sendTransaction: () => void
   currentAccount: string
   formData: { addressTo: string; amount: string }
   setFormData: (param: { addressTo: string; amount: string }) => void
@@ -12,6 +15,7 @@ type Context = {
 
 export const TransactionContext = React.createContext<Context>({
   connectWallet: () => {},
+  sendTransaction: () => {},
   currentAccount: '',
   formData: { addressTo: '', amount: '' },
   handleChange: () => {},
@@ -94,6 +98,58 @@ export const TransactionProvider = (props: { children: any }) => {
     checkIfWalletIsConnected()
   }, [])
 
+  const getEthereumContract = () => {
+    const provider = new ethers.providers.Web3Provider((window as any).ethereum)
+    const signer = provider.getSigner()
+    const transactionContract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      signer
+    )
+
+    return transactionContract
+  }
+
+  const sendTransaction = async () => {
+    if (!(window as any).ethereum) alert('Install metamask')
+    try {
+      const { addressTo, amount } = formData
+      const transactionContract = getEthereumContract()
+
+      const parsedAmount = ethers.utils.parseEther(amount)
+
+      await (window as any).ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [
+          {
+            from: currentAccount,
+            to: addressTo,
+            // gas: '0x7EF40', // 520000 Gwei
+            value: parsedAmount._hex,
+          },
+        ],
+      })
+      const transactionHash = await transactionContract.publishTransaction(
+        addressTo,
+        parsedAmount,
+        `Transferring ETH ${parsedAmount} to ${addressTo}`,
+        'TRANSFER'
+      )
+      setIsLoading(true)
+      await transactionHash.wait()
+      // await saveTransaction(
+      //   transactionHash.hash,
+      //   amount,
+      //   connectedAccount,
+      //   addressTo
+      // )
+
+      setIsLoading(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <TransactionContext.Provider
       value={{
@@ -103,6 +159,7 @@ export const TransactionProvider = (props: { children: any }) => {
         setFormData,
         handleChange,
         isLoading,
+        sendTransaction,
       }}
     >
       {props.children}

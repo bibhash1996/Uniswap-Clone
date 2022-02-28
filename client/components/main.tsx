@@ -4,6 +4,7 @@ import { AiOutlineDown } from 'react-icons/ai'
 import ethLogo from '../assets/eth.png'
 import { useContext } from 'react'
 import { useRouter } from 'next/router'
+import { TransactionContext } from '../context/transactionContext'
 
 const style = {
   wrapper: `w-screen flex items-center justify-center mt-14`,
@@ -20,7 +21,15 @@ const style = {
 }
 
 export default function Main() {
-  const handleSubmit = async (e: any) => {}
+  const { formData, handleChange, sendTransaction } =
+    useContext(TransactionContext)
+
+  const handleSubmit = async (e: any) => {
+    const { addressTo, amount } = formData
+    e.preventDefault()
+    if (!addressTo || !amount) return
+    sendTransaction()
+  }
 
   return (
     <div className={style.wrapper}>
@@ -37,7 +46,9 @@ export default function Main() {
             className={style.transferPropInput}
             placeholder="0.0"
             pattern="^[0-9]*[.,]?[0-9]*$"
-            onChange={(e) => {}}
+            onChange={(e) => {
+              handleChange(e, 'amount')
+            }}
           />
           <div className={style.currencySelector}>
             <div className={style.currencySelectorContent}>
@@ -54,7 +65,9 @@ export default function Main() {
             type="text"
             className={style.transferPropInput}
             placeholder="0x..."
-            onChange={(e) => {}}
+            onChange={(e) => {
+              handleChange(e, 'addressTo')
+            }}
           />
           <div className={style.currencySelector}></div>
         </div>
